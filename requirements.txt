@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+azure-storage-blob
+azure-storage-queue
+azure-data-tables
+python-multipart
+jinja2
