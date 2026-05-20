@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
-from fastapi.concurrency import asynccontextmanager
+from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-AZURE_CONNECTION_STRING = os.environ.get("AZURE_CONNECTION_STRING", "")
 BLOB_CONTAINER = "documents"
 QUEUE_NAME = "process-queue"
 TABLE_NAME = "DocumentMetadata"
