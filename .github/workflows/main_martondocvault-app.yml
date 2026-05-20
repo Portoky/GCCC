@@ -46,8 +46,9 @@ jobs:
         with:
           name: python-app
           path: |
-            .
-            !antenv/
+              .
+              !antenv/
+              !frontend/node_modules/
 
   deploy:
     runs-on: ubuntu-latest
