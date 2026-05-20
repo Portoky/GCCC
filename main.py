@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
+from fastapi.concurrency import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +11,18 @@ import uuid
 import json
 import os
 
-app = FastAPI()
+blob_service, queue_service, table_service = None, None, None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global blob_service, queue_service, table_service
+    conn = os.environ.get("AZURE_CONNECTION_STRING", "")
+    blob_service = BlobServiceClient.from_connection_string(conn)
+    queue_service = QueueServiceClient.from_connection_string(conn)
+    table_service = TableServiceClient.from_connection_string(conn)
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,9 +37,6 @@ BLOB_CONTAINER = "documents"
 QUEUE_NAME = "process-queue"
 TABLE_NAME = "DocumentMetadata"
 
-blob_service = BlobServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
-queue_service = QueueServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
-table_service = TableServiceClient.from_connection_string(AZURE_CONNECTION_STRING)
 
 
 def get_user(request: Request) -> str:
