@@ -6,8 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from azure.storage.blob import BlobServiceClient
 from azure.storage.queue import QueueServiceClient
 from azure.data.tables import TableServiceClient
-from azure.storage.blob import generate_blob_sas, BlobSasPermissions
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import uuid
 import json
 import os
@@ -120,14 +119,6 @@ async def list_files(request: Request):
             "blob_name": e.get("blob_name", ""),
             "tags": e.get("tags", "[]"),
             "summary": e.get("summary", ""),
-            "sas_url": generate_blob_sas(
-                account_name=os.environ.get("AZURE_ACCOUNT_NAME", ""),
-                container_name=BLOB_CONTAINER,
-                blob_name=e.get("blob_name", ""),
-                account_key=os.environ.get("AZURE_ACCOUNT_KEY", ""),
-                permission=BlobSasPermissions(read=True),
-                expiry=datetime.now(timezone.utc) + timedelta(minutes=5)
-            ),
         }
         for e in visible
     ]}
