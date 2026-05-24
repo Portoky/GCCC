@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
+from fastapi import FastAPI, Response, UploadFile, File, Form, HTTPException, Request
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
@@ -164,14 +164,15 @@ async def preview(row_key: str, request: Request):
     blob_name = entity["blob_name"]
     container_client = blob_service.get_container_client(BLOB_CONTAINER)
     blob_client = container_client.get_blob_client(blob_name)
-    stream = blob_client.download_blob()
+    data = blob_client.download_blob().readall()
 
-    return StreamingResponse(
-        stream.chunks(),
+    return Response(
+        content=data,
         media_type=entity.get("content_type", "application/octet-stream"),
-        headers={"Content-Disposition": f"inline; filename={entity['filename']}"}
+        headers={
+            "Content-Disposition": f'inline; filename="{entity["filename"]}"'
+        }
     )
-
 
 @app.delete("/api/files/{row_key}")
 async def delete_file(row_key: str, request: Request):
