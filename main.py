@@ -11,6 +11,8 @@ import uuid
 import json
 import os
 
+from worker import start_worker
+
 blob_service, queue_service, table_service = None, None, None
 
 @asynccontextmanager
@@ -20,6 +22,7 @@ async def lifespan(app: FastAPI):
     blob_service = BlobServiceClient.from_connection_string(conn)
     queue_service = QueueServiceClient.from_connection_string(conn)
     table_service = TableServiceClient.from_connection_string(conn)
+    start_worker()  # start background worker
     yield
 
 app = FastAPI(lifespan=lifespan)
