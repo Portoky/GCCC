@@ -58,11 +58,13 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
           <div className="file-info">
             <div className="file-name">
               <a
-                href={`/api/preview/${f.id}`}
-                className="file-link"
-              >
-                {f.filename}
-              </a>
+                href={f.sas_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="file-link"
+                >
+                  {f.filename}
+                </a>
             </div>
             <div className="file-meta">
               <span>{formatSize(f.size)}</span>
