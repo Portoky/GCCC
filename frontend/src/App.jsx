@@ -72,6 +72,12 @@ export default function App() {
             My Files
           </button>
           <button
+            className={`tab ${activeTab === "shared" ? "active" : ""}`}
+            onClick={() => setActiveTab("shared")}
+          >
+            Shared Files
+          </button>
+          <button
             className={`tab ${activeTab === "upload" ? "active" : ""}`}
             onClick={() => setActiveTab("upload")}
           >
@@ -82,9 +88,16 @@ export default function App() {
         <div className="content">
           {activeTab === "upload" ? (
             <Upload onUploaded={() => { fetchFiles(); setActiveTab("files"); }} />
+          ) : activeTab === "shared" ? (
+            <FileList
+              files={files.filter(f => !f.is_own && f.is_public)}
+              loading={loading}
+              onDelete={handleDelete}
+              onDownload={handleDownload}
+            />
           ) : (
             <FileList
-              files={files}
+              files={files.filter(f => f.is_own)}
               loading={loading}
               onDelete={handleDelete}
               onDownload={handleDownload}
