@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 import uuid
 import json
 import os
-
 from worker import start_worker
 
 blob_service, queue_service, table_service = None, None, None
