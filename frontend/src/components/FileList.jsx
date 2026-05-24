@@ -59,8 +59,6 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
             <div className="file-name">
               <a
                 href={`/api/preview/${f.id}`}
-                target="_blank"
-                rel="noreferrer"
                 className="file-link"
               >
                 {f.filename}
