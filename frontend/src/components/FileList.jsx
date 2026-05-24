@@ -1,4 +1,10 @@
 export default function FileList({ files, loading, onDelete, onDownload }) {
+  const [expanded, setExpanded] = useState({});
+
+  const toggleSummary = (id) => {
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const getFileIcon = (contentType) => {
     if (!contentType) return "📄";
     if (contentType.startsWith("image/")) return "🖼️";
@@ -71,7 +77,17 @@ export default function FileList({ files, loading, onDelete, onDownload }) {
             )}
 
             {f.summary && (
-              <div className="file-summary">{f.summary}</div>
+              <div>
+                <button
+                  className="summary-toggle"
+                  onClick={() => toggleSummary(f.id)}
+                >
+                  {expanded[f.id] ? "▲ Hide summary" : "▼ Show summary"}
+                </button>
+                {expanded[f.id] && (
+                  <div className="file-summary">{f.summary}</div>
+                )}
+              </div>
             )}
           </div>
           </div>
