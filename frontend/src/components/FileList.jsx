@@ -45,6 +45,8 @@ export default function FileList({ files, loading, onDelete, onDownload }) {
 
           <div className="file-info">
             <div className="file-name">{f.filename}</div>
+            <div className="file-info">
+            <div className="file-name">{f.filename}</div>
             <div className="file-meta">
               <span>{formatSize(f.size)}</span>
               <span>{formatDate(f.uploaded_at)}</span>
@@ -53,7 +55,25 @@ export default function FileList({ files, loading, onDelete, onDownload }) {
                 {f.is_public ? "● public" : "○ private"}
               </span>
               {!f.is_own && <span className="badge badge-shared">shared</span>}
+              {f.processed ? (
+                <span className="badge badge-processed">✓ analysed</span>
+              ) : (
+                <span className="badge badge-pending">⏳ processing</span>
+              )}
             </div>
+
+            {f.tags && f.tags.length > 0 && (
+              <div className="file-tags">
+                {JSON.parse(f.tags).map((tag, i) => (
+                  <span key={i} className="tag">{tag}</span>
+                ))}
+              </div>
+            )}
+
+            {f.summary && (
+              <div className="file-summary">{f.summary}</div>
+            )}
+          </div>
           </div>
 
           <div className="file-actions">

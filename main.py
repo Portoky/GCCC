@@ -118,6 +118,8 @@ async def list_files(request: Request):
             "is_own": e.get("uploader") == user,
             "processed": e.get("processed", False),
             "blob_name": e.get("blob_name", ""),
+            "tags": e.get("tags", "[]"),
+            "summary": e.get("summary", ""),
         }
         for e in visible
     ]}

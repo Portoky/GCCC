@@ -400,3 +400,30 @@ body {
   color: var(--danger);
   font-size: 0.88rem;
 }
+
+.badge-processed { background: rgba(52,211,153,0.12); color: var(--success); }
+.badge-pending { background: rgba(251,191,36,0.12); color: #fbbf24; }
+
+.file-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  background: rgba(79,142,247,0.1);
+  border: 1px solid rgba(79,142,247,0.2);
+  color: var(--accent);
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.file-summary {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+  font-style: italic;
+}
