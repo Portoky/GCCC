@@ -11,6 +11,8 @@ import uuid
 import json
 import os
 from worker import start_worker
+from azure.storage.blob import ContentSettings
+import mimetypes
 
 blob_service, queue_service, table_service = None, None, None
 
@@ -63,7 +65,23 @@ async def upload(
 
     # 1. Upload file to Blob Storage
     container_client = blob_service.get_container_client(BLOB_CONTAINER)
-    container_client.upload_blob(blob_name, content)
+
+    content_type = file.content_type
+
+    if not content_type:
+        content_type, _ = mimetypes.guess_type(file.filename)
+
+    if not content_type:
+        content_type = "application/octet-stream"
+
+    container_client.upload_blob(
+        blob_name,
+        content,
+        overwrite=True,
+        content_settings=ContentSettings(
+            content_type=content_type
+        )
+    )
 
     # 2. Push job to Queue for async processing
     queue_client = queue_service.get_queue_client(QUEUE_NAME)
@@ -81,7 +99,7 @@ async def upload(
         "filename": file.filename,
         "blob_name": blob_name,
         "size": file_size,
-        "content_type": file.content_type or "application/octet-stream",
+        "content_type": content_type,
         "uploaded_at": datetime.now(timezone.utc).isoformat(),
         "uploader": user,
         "is_public": is_public,
