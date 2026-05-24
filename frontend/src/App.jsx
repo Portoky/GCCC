@@ -75,7 +75,7 @@ export default function App() {
             className={`tab ${activeTab === "shared" ? "active" : ""}`}
             onClick={() => setActiveTab("shared")}
           >
-            Shared Files
+            Other Shared Files
           </button>
           <button
             className={`tab ${activeTab === "upload" ? "active" : ""}`}
@@ -94,6 +94,7 @@ export default function App() {
               loading={loading}
               onDelete={handleDelete}
               onDownload={handleDownload}
+              activeTab={activeTab}
             />
           ) : (
             <FileList
@@ -101,6 +102,7 @@ export default function App() {
               loading={loading}
               onDelete={handleDelete}
               onDownload={handleDownload}
+              activeTab={activeTab}
             />
           )}
         </div>

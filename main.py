@@ -148,6 +148,30 @@ async def download(row_key: str, request: Request):
         headers={"Content-Disposition": f"attachment; filename={entity['filename']}"}
     )
 
+@app.get("/api/preview/{row_key}")
+async def preview(row_key: str, request: Request):
+    user = get_user(request)
+    table_client = table_service.get_table_client(TABLE_NAME)
+
+    entities = list(table_client.query_entities(f"RowKey eq '{row_key}'"))
+    if not entities:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    entity = entities[0]
+    if entity.get("uploader") != user and not entity.get("is_public", False):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    blob_name = entity["blob_name"]
+    container_client = blob_service.get_container_client(BLOB_CONTAINER)
+    blob_client = container_client.get_blob_client(blob_name)
+    stream = blob_client.download_blob()
+
+    return StreamingResponse(
+        stream.chunks(),
+        media_type=entity.get("content_type", "application/octet-stream"),
+        headers={"Content-Disposition": f"inline; filename={entity['filename']}"}
+    )
+
 
 @app.delete("/api/files/{row_key}")
 async def delete_file(row_key: str, request: Request):

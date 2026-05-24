@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function FileList({ files, loading, onDelete, onDownload }) {
+export default function FileList({ files, loading, onDelete, onDownload, activeTab }) {
   const [expanded, setExpanded] = useState({});
 
   const toggleSummary = (id) => {
@@ -37,7 +37,12 @@ export default function FileList({ files, loading, onDelete, onDownload }) {
   }
 
   if (!files.length) {
-    return (
+    return activeTab === "shared" ? (
+      <div className="empty">
+        <div className="empty-icon">👥</div>
+        <div className="empty-text">No shared files yet. Collaborate with others to see shared documents here.</div>
+      </div>
+    ) : (
       <div className="empty">
         <div className="empty-icon">🗂️</div>
         <div className="empty-text">No files yet. Upload your first document.</div>
@@ -50,11 +55,17 @@ export default function FileList({ files, loading, onDelete, onDownload }) {
       {files.map((f) => (
         <div className="file-card" key={f.id}>
           <div className="file-icon">{getFileIcon(f.content_type)}</div>
-
           <div className="file-info">
-            <div className="file-name">{f.filename}</div>
-            <div className="file-info">
-            <div className="file-name">{f.filename}</div>
+            <div className="file-name">
+              <a
+                href={`/api/preview/${f.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="file-link"
+              >
+                {f.filename}
+              </a>
+            </div>
             <div className="file-meta">
               <span>{formatSize(f.size)}</span>
               <span>{formatDate(f.uploaded_at)}</span>
@@ -91,7 +102,6 @@ export default function FileList({ files, loading, onDelete, onDownload }) {
                 )}
               </div>
             )}
-          </div>
           </div>
 
           <div className="file-actions">

@@ -444,3 +444,14 @@ body {
 .summary-toggle:hover {
   opacity: 1;
 }
+
+.file-link {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.file-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
