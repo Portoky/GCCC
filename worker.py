@@ -7,14 +7,32 @@ from azure.storage.blob import BlobServiceClient
 from azure.data.tables import TableServiceClient
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
+import io
+from pypdf import PdfReader
 
 
 def get_text_from_blob(blob_service, blob_name: str) -> str:
     container_client = blob_service.get_container_client("documents")
     blob_client = container_client.get_blob_client(blob_name)
     content = blob_client.download_blob().readall()
+    
+    filename = blob_name.lower()
+    
+    # PDF extraction
+    if filename.endswith(".pdf"):
+        try:
+            reader = PdfReader(io.BytesIO(content))
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text() or ""
+            return text[:5000]
+        except Exception as e:
+            print(f"PDF extraction failed: {e}")
+            return ""
+    
+    # Plain text files
     try:
-        return content.decode("utf-8", errors="ignore")[:5000]  # limit to 5000 chars
+        return content.decode("utf-8", errors="ignore")[:5000]
     except Exception:
         return ""
 
