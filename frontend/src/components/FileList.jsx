@@ -32,6 +32,14 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
     });
   };
 
+  const isPreviewable = (type) => {
+    return (
+      type?.startsWith("image/") ||
+      type === "application/pdf" ||
+      type?.startsWith("text/")
+    );
+  };
+
   if (loading) {
     return <div className="loading"><div className="spinner" /></div>;
   }
@@ -56,14 +64,27 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
         <div className="file-card" key={f.id}>
           <div className="file-icon">{getFileIcon(f.content_type)}</div>
           <div className="file-info">
-            <div className="file-name">
-              <a
-                href={`/api/preview/${f.id}`}
-                className="file-link"
-              >
-                {f.filename}
-              </a>
-            </div>
+             <div className="file-name">
+                {previewable ? (
+                  <a
+                    href={`/api/preview/${f.id}`}
+                    className="file-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Preview file"
+                  >
+                    {f.filename}
+                  </a>
+                ) : (
+                  <button
+                    className="file-link file-link-button"
+                    onClick={() => onDownload(f.id, f.filename)}
+                    title="Download file"
+                  >
+                    {f.filename}
+                  </button>
+                )}
+              </div>
             <div className="file-meta">
               <span>{formatSize(f.size)}</span>
               <span>{formatDate(f.uploaded_at)}</span>

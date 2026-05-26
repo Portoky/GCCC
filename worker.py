@@ -103,6 +103,9 @@ def worker_loop():
 
                     # Run AI processing
                     summary, tags = process_document(text, ai_client)
+                    
+                    if not filename.lower().endswith(".pdf"):
+                        tags = []
 
                     # Update table metadata
                     entities = list(table_client.query_entities(
