@@ -60,12 +60,14 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
 
   return (
     <div className="file-grid">
-      {files.map((f) => (
-        <div className="file-card" key={f.id}>
-          <div className="file-icon">{getFileIcon(f.content_type)}</div>
-          <div className="file-info">
-             <div className="file-name">
-                {previewable ? (
+      {files.map((f) => {
+        const previewable = isPreviewable(f.content_type);
+        return (
+          <div className="file-card" key={f.id}>
+            <div className="file-icon">{getFileIcon(f.content_type)}</div>
+            <div className="file-info">
+               <div className="file-name">
+                  {previewable ? (
                   <a
                     href={`/api/preview/${f.id}`}
                     className="file-link"
@@ -142,7 +144,8 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
