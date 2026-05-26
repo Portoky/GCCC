@@ -9,6 +9,7 @@ from azure.ai.textanalytics import TextAnalyticsClient
 from azure.core.credentials import AzureKeyCredential
 import io
 from pypdf import PdfReader
+from docx import Document
 
 
 def get_text_from_blob(blob_service, blob_name: str) -> str:
@@ -30,6 +31,18 @@ def get_text_from_blob(blob_service, blob_name: str) -> str:
             print(f"PDF extraction failed: {e}")
             return ""
     
+    # DOCX extraction
+    if filename.endswith(".docx"):
+        try:
+            doc = Document(io.BytesIO(content))
+            text = ""
+            for para in doc.paragraphs:
+                text += para.text + "\n"
+            return text[:5000]
+        except Exception as e:
+            print(f"DOCX extraction failed: {e}")
+            return ""
+    
     # Plain text files
     try:
         return content.decode("utf-8", errors="ignore")[:5000]
@@ -46,7 +59,7 @@ def process_document(text: str, ai_client: TextAnalyticsClient, filename: str):
 
     if filename.lower().endswith(".pdf"):
         try:
-            # Extract key phrases (tags)
+            # Extract key phrases (tags) - PDF only
             kp_response = ai_client.extract_key_phrases([text])
             for doc in kp_response:
                 if not doc.is_error:
@@ -54,15 +67,16 @@ def process_document(text: str, ai_client: TextAnalyticsClient, filename: str):
         except Exception as e:
             print(f"Key phrase extraction failed: {e}")
 
-    try:
-        # Abstractive summarization
-        poller = ai_client.begin_abstract_summary([text])
-        results = poller.result()
-        for result in results:
-            if not result.is_error:
-                summary = " ".join([s.text for s in result.summaries])
-    except Exception as e:
-        print(f"Summarization failed: {e}")
+    # Summarization for PDF and DOCX
+    if filename.lower().endswith((".pdf", ".docx")):
+        try:
+            poller = ai_client.begin_abstract_summary([text])
+            results = poller.result()
+            for result in results:
+                if not result.is_error:
+                    summary = " ".join([s.text for s in result.summaries])
+        except Exception as e:
+            print(f"Summarization failed: {e}")
 
     return summary, tags
 
