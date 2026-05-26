@@ -13,6 +13,7 @@ import os
 from worker import start_worker
 from azure.storage.blob import ContentSettings
 import mimetypes
+import urllib.parse
 
 blob_service, queue_service, table_service = None, None, None
 
@@ -160,10 +161,16 @@ async def download(row_key: str, request: Request):
     blob_client = container_client.get_blob_client(blob_name)
     stream = blob_client.download_blob()
 
+    filename = entity['filename']
+    quoted_filename = urllib.parse.quote(filename)
+    disposition = (
+        f"attachment; filename=\"{filename}\"; filename*=UTF-8''{quoted_filename}"
+    )
+
     return StreamingResponse(
         stream.chunks(),
         media_type=entity.get("content_type", "application/octet-stream"),
-        headers={"Content-Disposition": f"attachment; filename={entity['filename']}"}
+        headers={"Content-Disposition": disposition}
     )
 
 @app.get("/api/preview/{row_key}")

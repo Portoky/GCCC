@@ -102,13 +102,16 @@ export default function FileList({ files, loading, onDelete, onDownload, activeT
               )}
             </div>
 
-            {f.tags && f.tags.length > 0 && (
-              <div className="file-tags">
-                {JSON.parse(f.tags).map((tag, i) => (
-                  <span key={i} className="tag">{tag}</span>
-                ))}
-              </div>
-            )}
+            {(() => {
+              const tags = f.tags ? JSON.parse(f.tags) : [];
+              return tags.length > 0 ? (
+                <div className="file-tags">
+                  {tags.map((tag, i) => (
+                    <span key={i} className="tag">{tag}</span>
+                  ))}
+                </div>
+              ) : null;
+            })()}
 
             {f.summary && (
               <div>

@@ -37,21 +37,22 @@ def get_text_from_blob(blob_service, blob_name: str) -> str:
         return ""
 
 
-def process_document(text: str, ai_client: TextAnalyticsClient):
+def process_document(text: str, ai_client: TextAnalyticsClient, filename: str):
     summary = ""
     tags = []
 
     if not text.strip():
         return summary, tags
 
-    try:
-        # Extract key phrases (tags)
-        kp_response = ai_client.extract_key_phrases([text])
-        for doc in kp_response:
-            if not doc.is_error:
-                tags = list(doc.key_phrases)[:10]
-    except Exception as e:
-        print(f"Key phrase extraction failed: {e}")
+    if filename.lower().endswith(".pdf"):
+        try:
+            # Extract key phrases (tags)
+            kp_response = ai_client.extract_key_phrases([text])
+            for doc in kp_response:
+                if not doc.is_error:
+                    tags = list(doc.key_phrases)[:10]
+        except Exception as e:
+            print(f"Key phrase extraction failed: {e}")
 
     try:
         # Abstractive summarization
@@ -102,10 +103,7 @@ def worker_loop():
                     text = get_text_from_blob(blob_service, blob_name)
 
                     # Run AI processing
-                    summary, tags = process_document(text, ai_client)
-                    
-                    if not filename.lower().endswith(".pdf"):
-                        tags = []
+                    summary, tags = process_document(text, ai_client, filename)
 
                     # Update table metadata
                     entities = list(table_client.query_entities(
